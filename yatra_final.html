@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yatra — Incredible India | Official Tourism Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════ */
+:root {
+  --saffron: #E8501A; --saffron2: #FF7B3A;
+  --gold: #C9920A;    --gold2: #F0B429;
+  --deep: #0F0800;    --deep2: #1E1000;
+  --cream: #FEF6E8;   --cream2: #FDF0D5;
+  --green: #0A6B2E;   --green2: #138808;
+  --text: #1A0A00;    --muted: #6B4C2A;
+  --border: rgba(200,140,50,0.2);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); overflow-x:hidden; }
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:var(--cream2); }
+::-webkit-scrollbar-thumb { background:var(--saffron); border-radius:3px; }
+
+/* MANDALA BG */
+.mandala-bg {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:0; opacity:0.025;
+  background-image:
+    radial-gradient(circle at 20% 20%, var(--saffron) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--gold) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, var(--green) 0%, transparent 70%);
+}
+
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
+nav {
+  position:fixed; top:0; width:100%; z-index:1000;
+  background:rgba(254,246,232,0.96); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border); height:68px;
+  display:flex; align-items:center; padding:0 2.5rem; gap:1.5rem;
+}
+.nav-logo {
+  font-family:'Cormorant Garamond',serif; font-size:1.8rem;
+  font-weight:700; color:var(--saffron); letter-spacing:-0.5px;
+  display:flex; align-items:center; gap:0.4rem; cursor:pointer; flex-shrink:0;
+}
+.nav-logo .dot { color:var(--green2); }
+.nav-hindi { font-family:'Tiro Devanagari Hindi',serif; font-size:0.85rem; color:var(--muted); }
+.nav-links { display:flex; gap:1.8rem; list-style:none; margin-left:auto; }
+.nav-links a {
+  text-decoration:none; color:var(--text); font-size:0.88rem; font-weight:500;
+  transition:color 0.2s; position:relative; cursor:pointer;
+}
+.nav-links a::after { content:''; position:absolute; bottom:-4px; left:0; right:0; height:2px; background:var(--saffron); transform:scaleX(0); transition:transform 0.2s; }
+.nav-links a:hover { color:var(--saffron); }
+.nav-links a:hover::after { transform:scaleX(1); }
+.nav-actions { display:flex; gap:0.8rem; align-items:center; }
+
+/* API STATUS PILL */
+.api-pill {
+  display:flex; align-items:center; gap:0.45rem;
+  border:1px solid var(--border); border-radius:20px;
+  padding:0.3rem 0.85rem; font-size:0.72rem; color:var(--muted);
+}
+.api-dot { width:7px; height:7px; border-radius:50%; background:#bbb; flex-shrink:0; }
+.api-dot.on  { background:#4ade80; animation:blink 2s infinite; }
+.api-dot.off { background:var(--saffron); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+.btn-nav-login {
+  border:1.5px solid var(--saffron); color:var(--saffron);
+  background:transparent; padding:0.45rem 1.2rem; border-radius:25px;
+  font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s;
+  font-family:'DM Sans',sans-serif;
+}
+.btn-nav-login:hover { background:var(--saffron); color:white; }
+.btn-nav-signup {
+  background:var(--saffron); color:white; border:none;
+  padding:0.45rem 1.2rem; border-radius:25px; font-size:0.85rem;
+  font-weight:500; cursor:pointer; transition:all 0.2s;
+  font-family:'DM Sans',sans-serif; box-shadow:0 2px 12px rgba(232,80,26,0.3);
+}
+.btn-nav-signup:hover { background:var(--saffron2); transform:translateY(-1px); }
+#nav-guest { display:flex; gap:0.8rem; }
+.nav-user-info { display:none; align-items:center; gap:0.8rem; }
+.nav-avatar { width:36px; height:36px; border-radius:50%; background:var(--saffron); color:white; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:0.9rem; }
+.nav-username { font-size:0.88rem; font-weight:500; }
+.btn-logout { background:none; border:1px solid var(--border); color:var(--muted); padding:0.35rem 0.8rem; border-radius:20px; font-size:0.8rem; cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+.btn-logout:hover { border-color:var(--saffron); color:var(--saffron); }
+
+/* ══════════════════════════════════════
+   PAGE SYSTEM
+══════════════════════════════════════ */
+.page { display:none; min-height:100vh; }
+.page.active { display:block; }
+
+/* ══════════════════════════════════════
+   HOME PAGE
+══════════════════════════════════════ */
+#page-home { padding-top:68px; }
+
+.hero {
+  min-height:calc(100vh - 68px);
+  background:
+    radial-gradient(ellipse at 75% 25%, rgba(232,80,26,0.1) 0%, transparent 55%),
+    radial-gradient(ellipse at 25% 75%, rgba(10,107,46,0.07) 0%, transparent 55%),
+    linear-gradient(160deg, var(--cream) 0%, var(--cream2) 100%);
+  display:flex; align-items:center; justify-content:center;
+  text-align:center; padding:4rem 2rem; position:relative; overflow:hidden;
+}
+.hero-rangoli {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:650px; height:650px; border-radius:50%;
+  background:repeating-conic-gradient(rgba(232,80,26,0.03) 0deg 10deg, rgba(201,146,10,0.03) 10deg 20deg);
+  animation:spin 60s linear infinite;
+}
+@keyframes spin { to { transform:translate(-50%,-50%) rotate(360deg); } }
+.hero-content { position:relative; z-index:1; max-width:840px; }
+.hero-tag {
+  display:inline-flex; align-items:center; gap:0.6rem;
+  background:rgba(232,80,26,0.08); border:1px solid rgba(232,80,26,0.25);
+  color:var(--saffron); padding:0.4rem 1.3rem; border-radius:25px;
+  font-size:0.82rem; font-weight:600; margin-bottom:1.8rem;
+  animation:fadeUp 0.6s ease both;
+}
+.hero h1 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3rem,7.5vw,5.5rem); line-height:1.08; font-weight:700;
+  margin-bottom:0.5rem; animation:fadeUp 0.7s 0.1s ease both;
+}
+.hero h1 em { color:var(--saffron); font-style:italic; }
+.hero-hindi { font-family:'Tiro Devanagari Hindi',serif; font-size:1.5rem; color:var(--gold); margin-bottom:1.5rem; animation:fadeUp 0.7s 0.15s ease both; }
+.hero p { font-size:1.08rem; color:var(--muted); max-width:590px; margin:0 auto 2.5rem; line-height:1.75; animation:fadeUp 0.7s 0.2s ease both; }
+.hero-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; animation:fadeUp 0.7s 0.3s ease both; }
+.btn-primary { background:var(--saffron); color:white; padding:0.9rem 2.2rem; border-radius:50px; font-size:0.95rem; font-weight:600; border:none; cursor:pointer; transition:all 0.25s; box-shadow:0 4px 20px rgba(232,80,26,0.35); font-family:'DM Sans',sans-serif; }
+.btn-primary:hover { transform:translateY(-3px); box-shadow:0 8px 30px rgba(232,80,26,0.45); }
+.btn-outline { background:transparent; color:var(--text); padding:0.9rem 2.2rem; border-radius:50px; font-size:0.95rem; font-weight:500; border:2px solid rgba(26,10,0,0.15); cursor:pointer; transition:all 0.25s; font-family:'DM Sans',sans-serif; }
+.btn-outline:hover { border-color:var(--saffron); color:var(--saffron); }
+
+/* STATS BAR */
+.stats-bar { background:var(--deep); padding:2.5rem 2rem; display:flex; justify-content:center; gap:4rem; flex-wrap:wrap; }
+.stat { text-align:center; }
+.stat-n { font-family:'Cormorant Garamond',serif; font-size:2.4rem; font-weight:700; color:var(--gold2); }
+.stat-l { font-size:0.82rem; color:rgba(255,255,255,0.5); margin-top:0.2rem; }
+
+/* SECTIONS */
+.section { padding:5rem 2rem; max-width:1200px; margin:0 auto; }
+.sec-head { text-align:center; margin-bottom:3rem; }
+.sec-tag { display:inline-block; color:var(--saffron); font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:2.5px; margin-bottom:0.8rem; }
+.sec-title { font-family:'Cormorant Garamond',serif; font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; line-height:1.2; }
+.sec-sub { color:var(--muted); margin-top:0.7rem; font-size:0.95rem; }
+
+/* FILTER TABS */
+.filter-tabs { display:flex; gap:0.7rem; justify-content:center; flex-wrap:wrap; margin-bottom:2.5rem; }
+.ftab { background:white; color:var(--text); border:1.5px solid var(--border); padding:0.5rem 1.3rem; border-radius:25px; font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+.ftab.active, .ftab:hover { background:var(--saffron); color:white; border-color:var(--saffron); }
+
+/* DESTINATION CARDS */
+.dest-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:1.5rem; }
+.dest-card { background:white; border-radius:18px; overflow:hidden; cursor:pointer; box-shadow:0 2px 16px rgba(0,0,0,0.06); transition:all 0.3s; border:1px solid var(--border); }
+.dest-card:hover { transform:translateY(-8px); box-shadow:0 16px 48px rgba(0,0,0,0.13); }
+.dest-img { height:190px; display:flex; align-items:center; justify-content:center; font-size:5rem; position:relative; }
+.badge-verified { position:absolute; top:12px; right:12px; background:var(--green2); color:white; font-size:0.68rem; padding:0.22rem 0.7rem; border-radius:10px; font-weight:700; }
+.badge-hidden { position:absolute; top:12px; left:12px; background:var(--gold); color:white; font-size:0.68rem; padding:0.22rem 0.7rem; border-radius:10px; font-weight:700; }
+.dest-body { padding:1.3rem; }
+.dest-state { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; }
+.dest-name { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:700; margin:0.3rem 0; }
+.dest-desc { font-size:0.86rem; color:var(--muted); line-height:1.55; }
+.dest-tags { display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.9rem; }
+.dtag { background:rgba(232,80,26,0.07); color:var(--saffron); font-size:0.7rem; padding:0.2rem 0.65rem; border-radius:8px; font-weight:600; }
+
+/* FEATURES */
+.features-wrap { background:var(--deep); padding:5rem 2rem; }
+.feat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:1.5rem; max-width:1100px; margin:0 auto; }
+.feat-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:1.8rem; transition:all 0.3s; }
+.feat-card:hover { background:rgba(232,80,26,0.1); border-color:rgba(232,80,26,0.3); transform:translateY(-4px); }
+.feat-icon { font-size:2.2rem; margin-bottom:1rem; }
+.feat-title { font-size:1rem; font-weight:600; color:white; margin-bottom:0.5rem; }
+.feat-desc { font-size:0.83rem; color:rgba(255,255,255,0.45); line-height:1.6; }
+
+/* VISA SECTION */
+.visa-section { background:linear-gradient(135deg,var(--deep2),#2A1500); padding:5rem 2rem; color:white; }
+.visa-inner { max-width:900px; margin:0 auto; text-align:center; }
+.visa-alert-box { background:rgba(232,80,26,0.15); border:1px solid rgba(232,80,26,0.4); border-radius:16px; padding:2rem; margin-top:2rem; }
+.visa-alert-icon { font-size:3rem; margin-bottom:1rem; }
+.visa-alert-title { font-family:'Cormorant Garamond',serif; font-size:1.8rem; color:var(--gold2); margin-bottom:0.5rem; }
+.visa-alert-desc { color:rgba(255,255,255,0.6); font-size:0.95rem; line-height:1.7; }
+.visa-stats { display:flex; gap:2rem; justify-content:center; flex-wrap:wrap; margin-top:2rem; }
+.visa-stat { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.2rem 2rem; text-align:center; }
+.visa-stat-n { font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--saffron2); }
+.visa-stat-l { font-size:0.78rem; color:rgba(255,255,255,0.4); margin-top:0.2rem; }
+
+/* FOOTER */
+footer { background:var(--deep); color:rgba(255,255,255,0.4); padding:3rem 2rem; text-align:center; }
+.footer-logo { font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--saffron); margin-bottom:1rem; }
+.footer-links { display:flex; gap:2rem; justify-content:center; flex-wrap:wrap; margin-bottom:1.5rem; }
+.footer-links a { color:rgba(255,255,255,0.4); text-decoration:none; font-size:0.85rem; transition:color 0.2s; }
+.footer-links a:hover { color:var(--saffron2); }
+.footer-bottom { font-size:0.78rem; border-top:1px solid rgba(255,255,255,0.06); padding-top:1.5rem; margin-top:1rem; }
+.footer-sources { font-size:0.75rem; color:rgba(255,255,255,0.25); margin-top:0.5rem; }
+
+/* ══════════════════════════════════════
+   AUTH PAGES
+══════════════════════════════════════ */
+.auth-page {
+  min-height:100vh; padding-top:68px;
+  background:radial-gradient(ellipse at 80% 20%, rgba(232,80,26,0.08) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(10,107,46,0.05) 0%, transparent 60%), var(--cream);
+  display:flex; align-items:center; justify-content:center; padding:6rem 1.5rem 3rem;
+}
+.auth-card { background:white; border-radius:24px; padding:3rem; width:100%; max-width:460px; box-shadow:0 20px 60px rgba(0,0,0,0.1); border:1px solid var(--border); position:relative; overflow:hidden; }
+.auth-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--saffron),var(--gold2),var(--green2)); }
+.auth-ornament { text-align:center; font-size:2.5rem; margin-bottom:0.5rem; }
+.auth-title { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:700; text-align:center; color:var(--text); margin-bottom:0.3rem; }
+.auth-sub { text-align:center; color:var(--muted); font-size:0.88rem; margin-bottom:2rem; }
+.auth-form { display:flex; flex-direction:column; gap:1rem; }
+.form-group { display:flex; flex-direction:column; gap:0.4rem; }
+.form-label { font-size:0.82rem; font-weight:600; color:var(--text); letter-spacing:0.3px; }
+.form-input { border:1.5px solid rgba(0,0,0,0.1); border-radius:10px; padding:0.75rem 1rem; font-size:0.9rem; outline:none; transition:border-color 0.2s; font-family:'DM Sans',sans-serif; background:var(--cream); }
+.form-input:focus { border-color:var(--saffron); background:white; }
+.form-select { border:1.5px solid rgba(0,0,0,0.1); border-radius:10px; padding:0.75rem 1rem; font-size:0.9rem; outline:none; transition:border-color 0.2s; font-family:'DM Sans',sans-serif; background:var(--cream); cursor:pointer; }
+.form-select:focus { border-color:var(--saffron); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.btn-auth { background:var(--saffron); color:white; border:none; border-radius:10px; padding:0.9rem; font-size:1rem; font-weight:600; cursor:pointer; transition:all 0.25s; margin-top:0.5rem; font-family:'DM Sans',sans-serif; box-shadow:0 4px 16px rgba(232,80,26,0.3); display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+.btn-auth:hover:not(:disabled) { background:var(--saffron2); transform:translateY(-2px); }
+.btn-auth:disabled { opacity:0.65; cursor:not-allowed; transform:none; }
+.auth-switch { text-align:center; margin-top:1.5rem; font-size:0.88rem; color:var(--muted); }
+.auth-switch a { color:var(--saffron); font-weight:600; cursor:pointer; text-decoration:none; }
+.auth-switch a:hover { text-decoration:underline; }
+.auth-divider { display:flex; align-items:center; gap:1rem; margin:1rem 0; color:var(--muted); font-size:0.82rem; }
+.auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.tourist-notice { background:rgba(232,80,26,0.06); border:1px solid rgba(232,80,26,0.2); border-radius:10px; padding:1rem; font-size:0.82rem; color:var(--saffron); line-height:1.6; margin-bottom:1rem; }
+.tourist-notice strong { display:block; margin-bottom:0.3rem; }
+.field-error { font-size:0.76rem; color:var(--saffron); margin-top:0.2rem; display:none; }
+.field-error.show { display:block; }
+#visa-foreign-fields { transition:all 0.3s; }
+
+/* SPINNER */
+.spin { display:inline-block; width:17px; height:17px; border:2px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spinA 0.7s linear infinite; }
+@keyframes spinA { to { transform:rotate(360deg); } }
+
+/* ══════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════ */
+#page-dashboard { padding-top:68px; }
+.dash-wrap { max-width:1150px; margin:0 auto; padding:3rem 2rem; }
+
+.dash-header { background:linear-gradient(135deg,var(--saffron),var(--saffron2)); border-radius:20px; padding:2.5rem; color:white; margin-bottom:2rem; position:relative; overflow:hidden; }
+.dash-header::after { content:'🇮🇳'; position:absolute; right:2rem; top:50%; transform:translateY(-50%); font-size:5rem; opacity:0.15; }
+.dash-welcome { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:700; margin-bottom:0.3rem; }
+.dash-sub { font-size:0.9rem; opacity:0.85; }
+
+/* ADMIN SUMMARY STRIP */
+.summary-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
+.scard { border-radius:14px; padding:1.3rem 1.5rem; color:white; text-align:center; }
+.scard.c-green  { background:linear-gradient(135deg,#0A6B2E,#138808); }
+.scard.c-gold   { background:linear-gradient(135deg,#C9920A,#F0B429); }
+.scard.c-orange { background:linear-gradient(135deg,#b35000,#FF8C00); }
+.scard.c-red    { background:linear-gradient(135deg,#E8501A,#cc0000); }
+.scard-n { font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:700; }
+.scard-l { font-size:0.78rem; opacity:0.85; margin-top:0.25rem; }
+
+.dash-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1.2rem; margin-bottom:2rem; }
+.dash-card { background:white; border-radius:16px; padding:1.5rem; border:1px solid var(--border); box-shadow:0 2px 12px rgba(0,0,0,0.04); }
+.dash-card-icon { font-size:2rem; margin-bottom:0.8rem; }
+.dash-card-label { font-size:0.78rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.dash-card-value { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:700; margin-top:0.2rem; }
+.dash-card-value.danger  { color:var(--saffron); }
+.dash-card-value.safe    { color:var(--green2); }
+.dash-card-value.warning { color:var(--gold); }
+
+/* VISA STATUS CARD */
+.visa-status-card { background:white; border-radius:16px; padding:2rem; border:1px solid var(--border); margin-bottom:2rem; }
+.visa-status-title { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:700; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap; }
+.live-badge { font-family:'DM Sans',sans-serif; font-size:0.68rem; background:var(--green2); color:white; padding:0.2rem 0.65rem; border-radius:8px; font-weight:700; }
+.visa-progress-bar { height:12px; background:rgba(0,0,0,0.06); border-radius:6px; overflow:hidden; margin:1rem 0; }
+.visa-progress-fill { height:100%; border-radius:6px; transition:width 1.2s ease; }
+.visa-progress-fill.safe    { background:linear-gradient(90deg,var(--green),var(--green2)); }
+.visa-progress-fill.warning { background:linear-gradient(90deg,var(--gold),var(--gold2)); }
+.visa-progress-fill.danger  { background:linear-gradient(90deg,var(--saffron),#FF4500); }
+.visa-days-row { display:flex; justify-content:space-between; font-size:0.82rem; color:var(--muted); }
+.overstay-alert { background:rgba(232,80,26,0.08); border:2px solid rgba(232,80,26,0.4); border-radius:12px; padding:1.5rem; margin-top:1.5rem; }
+.overstay-alert-title { color:var(--saffron); font-weight:700; font-size:1rem; margin-bottom:0.5rem; }
+.overstay-alert-desc { font-size:0.85rem; color:var(--muted); line-height:1.6; }
+.emergency-contacts { background:var(--deep2); border-radius:12px; padding:1.5rem; margin-top:1rem; color:white; }
+.emergency-title { font-size:0.9rem; font-weight:600; margin-bottom:1rem; color:var(--gold2); }
+.emergency-item { display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.85rem; }
+.emergency-item:last-child { border-bottom:none; }
+.emergency-num { color:var(--gold2); font-weight:600; }
+
+/* TOURIST TABLE */
+.tourists-table-wrap { background:white; border-radius:16px; padding:2rem; border:1px solid var(--border); overflow-x:auto; }
+.table-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
+.table-title { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:700; }
+.table-controls { display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap; }
+.search-input { border:1.5px solid var(--border); border-radius:25px; padding:0.5rem 1.2rem; font-size:0.85rem; outline:none; font-family:'DM Sans',sans-serif; width:210px; transition:border-color 0.2s; }
+.search-input:focus { border-color:var(--saffron); }
+.filter-sel { border:1.5px solid var(--border); border-radius:25px; padding:0.5rem 1rem; font-size:0.82rem; outline:none; font-family:'DM Sans',sans-serif; cursor:pointer; background:white; }
+.btn-refresh { background:var(--saffron); color:white; border:none; border-radius:25px; padding:0.5rem 1.1rem; font-size:0.82rem; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+.btn-refresh:hover { background:var(--saffron2); }
+table { width:100%; border-collapse:collapse; min-width:700px; }
+th { text-align:left; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--muted); padding:0.7rem 1rem; border-bottom:2px solid var(--border); }
+td { padding:0.9rem 1rem; font-size:0.88rem; border-bottom:1px solid rgba(0,0,0,0.04); }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(232,80,26,0.02); }
+.status-badge { display:inline-flex; align-items:center; gap:0.3rem; padding:0.25rem 0.7rem; border-radius:20px; font-size:0.75rem; font-weight:600; }
+.status-active   { background:rgba(10,107,46,0.1);  color:var(--green); }
+.status-expiring { background:rgba(201,146,10,0.1); color:var(--gold); }
+.status-overstay { background:rgba(232,80,26,0.1);  color:var(--saffron); }
+.status-na       { background:rgba(0,0,0,0.05);     color:var(--muted); }
+.t-load { text-align:center; padding:3rem; color:var(--muted); font-size:0.9rem; }
+.t-empty { text-align:center; padding:3rem; color:var(--muted); }
+
+/* ══════════════════════════════════════
+   CHATBOT
+══════════════════════════════════════ */
+.chat-fab {
+  position:fixed; bottom:2rem; right:2rem; width:62px; height:62px; border-radius:50%;
+  background:linear-gradient(135deg,var(--saffron),var(--saffron2));
+  border:none; cursor:pointer; z-index:900;
+  display:flex; align-items:center; justify-content:center; font-size:1.7rem;
+  box-shadow:0 4px 20px rgba(232,80,26,0.5); transition:all 0.3s; animation:chatPulse 2.5s infinite;
+}
+.chat-fab:hover { transform:scale(1.1); }
+@keyframes chatPulse { 0%,100%{box-shadow:0 4px 20px rgba(232,80,26,0.5)} 50%{box-shadow:0 4px 35px rgba(232,80,26,0.8),0 0 0 8px rgba(232,80,26,0.1)} }
+.chat-window {
+  position:fixed; bottom:6.5rem; right:2rem; width:390px; height:545px;
+  background:white; border-radius:22px; box-shadow:0 24px 70px rgba(0,0,0,0.18);
+  z-index:900; display:flex; flex-direction:column; overflow:hidden;
+  transform:scale(0.85) translateY(20px); opacity:0; pointer-events:none;
+  transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.chat-window.open { transform:scale(1) translateY(0); opacity:1; pointer-events:all; }
+.chat-head { background:linear-gradient(135deg,var(--saffron),var(--saffron2)); padding:1.3rem 1.5rem; display:flex; align-items:center; gap:0.9rem; color:white; }
+.chat-avatar-wrap { width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; }
+.chat-head-info h3 { font-size:1rem; font-weight:700; }
+.chat-head-info p { font-size:0.75rem; opacity:0.85; }
+.chat-online { width:8px; height:8px; background:#4ade80; border-radius:50%; display:inline-block; margin-right:4px; }
+.chat-x { margin-left:auto; background:none; border:none; color:white; cursor:pointer; font-size:1.4rem; opacity:0.8; }
+.chat-x:hover { opacity:1; }
+.chat-msgs { flex:1; overflow-y:auto; padding:1.2rem; display:flex; flex-direction:column; gap:0.8rem; background:#FAFAFA; }
+.chat-msgs::-webkit-scrollbar { width:3px; }
+.chat-msgs::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.1); border-radius:3px; }
+.msg { max-width:88%; padding:0.75rem 1rem; border-radius:18px; font-size:0.87rem; line-height:1.55; animation:msgPop 0.3s ease; }
+@keyframes msgPop { from{opacity:0;transform:translateY(8px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+.msg.bot { background:white; border:1px solid rgba(0,0,0,0.07); color:var(--text); align-self:flex-start; border-bottom-left-radius:4px; box-shadow:0 1px 6px rgba(0,0,0,0.05); }
+.msg.user { background:linear-gradient(135deg,var(--saffron),var(--saffron2)); color:white; align-self:flex-end; border-bottom-right-radius:4px; }
+.quick-chips { display:flex; flex-wrap:wrap; gap:0.5rem; padding:0.6rem 1.2rem; background:#FAFAFA; border-top:1px solid rgba(0,0,0,0.05); }
+.chip { background:white; color:var(--saffron); border:1px solid rgba(232,80,26,0.3); padding:0.32rem 0.8rem; border-radius:20px; font-size:0.76rem; cursor:pointer; transition:all 0.2s; white-space:nowrap; font-family:'DM Sans',sans-serif; }
+.chip:hover { background:var(--saffron); color:white; }
+.chat-input-row { padding:0.9rem 1rem; background:white; border-top:1px solid rgba(0,0,0,0.07); display:flex; gap:0.5rem; }
+.chat-inp { flex:1; border:1.5px solid rgba(0,0,0,0.1); border-radius:25px; padding:0.6rem 1.1rem; font-size:0.87rem; outline:none; font-family:'DM Sans',sans-serif; transition:border-color 0.2s; }
+.chat-inp:focus { border-color:var(--saffron); }
+.chat-send { background:var(--saffron); color:white; border:none; border-radius:50%; width:40px; height:40px; cursor:pointer; font-size:1rem; transition:all 0.2s; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.chat-send:hover { background:var(--saffron2); transform:scale(1.05); }
+.typing { display:flex; align-items:center; gap:4px; padding:0.7rem 1rem; background:white; border:1px solid rgba(0,0,0,0.07); border-radius:18px; border-bottom-left-radius:4px; align-self:flex-start; box-shadow:0 1px 6px rgba(0,0,0,0.05); }
+.dot { width:6px; height:6px; background:var(--muted); border-radius:50%; animation:bounce 1.2s infinite; }
+.dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* TOAST */
+.toast { position:fixed; top:80px; right:2rem; z-index:9999; background:var(--deep); color:white; padding:0.9rem 1.5rem; border-radius:12px; font-size:0.88rem; font-weight:500; box-shadow:0 8px 30px rgba(0,0,0,0.2); transform:translateX(200%); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); max-width:320px; line-height:1.5; }
+.toast.show { transform:translateX(0); }
+.toast.success { border-left:4px solid var(--green2); }
+.toast.error   { border-left:4px solid var(--saffron); }
+.toast.warning { border-left:4px solid var(--gold); }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* RESPONSIVE */
+@media(max-width:900px){ .nav-links { display:none; } .summary-strip { grid-template-columns:repeat(2,1fr); } }
+@media(max-width:600px){ .form-row { grid-template-columns:1fr; } .chat-window { width:calc(100vw - 2rem); right:1rem; } .stats-bar { gap:2rem; } nav { padding:0 1.2rem; } }
+</style>
+</head>
+<body>
+
+<div class="mandala-bg"></div>
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════ -->
+<nav>
+  <div class="nav-logo" onclick="goHome()">
+    Yatra<span class="dot">.</span>
+    <span class="nav-hindi">यात्रा</span>
+  </div>
+
+  <ul class="nav-links">
+    <li><a onclick="goHome()">Home</a></li>
+    <li><a onclick="scrollTo('destinations')">Destinations</a></li>
+    <li><a onclick="scrollTo('features')">Features</a></li>
+    <li><a onclick="requireAuth()">Dashboard</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    <!-- Live API status pill -->
+    <div class="api-pill">
+      <div class="api-dot" id="apiDot"></div>
+      <span id="apiTxt">Connecting…</span>
+    </div>
+
+    <!-- Guest buttons -->
+    <div id="nav-guest">
+      <button class="btn-nav-login"  onclick="showPage('login')">Login</button>
+      <button class="btn-nav-signup" onclick="showPage('signup')">Register</button>
+    </div>
+
+    <!-- Logged-in user strip -->
+    <div class="nav-user-info" id="nav-user">
+      <div class="nav-avatar" id="nav-av">U</div>
+      <span class="nav-username" id="nav-nm">User</span>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HOME PAGE
+══════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <section class="hero">
+    <div class="hero-rangoli"></div>
+    <div class="hero-content">
+      <div class="hero-tag">🇮🇳 Official Government-Verified Tourism Platform</div>
+      <h1>Explore the Soul of<br><em>Incredible India</em></h1>
+      <div class="hero-hindi">अतुल्य भारत की यात्रा करें</div>
+      <p>The only platform where every destination, every fact, and every recommendation is verified by the Government of India. No fake reviews. No paid rankings. Just truth.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="openChat()">🤖 Ask AI Guide</button>
+        <button class="btn-outline" onclick="scrollTo('destinations')">Explore Destinations →</button>
+        <button class="btn-outline" onclick="showPage('signup')">Register as Tourist</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-n">3,691+</div><div class="stat-l">Heritage Sites</div></div>
+    <div class="stat"><div class="stat-n">40+</div><div class="stat-l">UNESCO Sites</div></div>
+    <div class="stat"><div class="stat-n">28</div><div class="stat-l">States & UTs</div></div>
+    <div class="stat"><div class="stat-n">100%</div><div class="stat-l">Govt. Verified</div></div>
+    <div class="stat"><div class="stat-n">9.2M+</div><div class="stat-l">Annual Tourists</div></div>
+  </div>
+
+  <!-- DESTINATIONS -->
+  <section id="destinations">
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-tag">✦ Explore India</div>
+        <h2 class="sec-title">Discover Every Corner of Bharat</h2>
+        <p class="sec-sub">All data sourced from Ministry of Tourism, ASI & data.gov.in</p>
+      </div>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="filterDest('all',this)">🗺️ All</button>
+        <button class="ftab" onclick="filterDest('popular',this)">⭐ Popular</button>
+        <button class="ftab" onclick="filterDest('hidden',this)">💎 Hidden Gems</button>
+        <button class="ftab" onclick="filterDest('nature',this)">🌿 Nature</button>
+        <button class="ftab" onclick="filterDest('heritage',this)">🏛️ Heritage</button>
+      </div>
+      <div class="dest-grid" id="destGrid"></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <div id="features" class="features-wrap">
+    <div class="sec-head" style="color:white;margin-bottom:3rem">
+      <div class="sec-tag" style="color:var(--saffron2)">✦ Platform Features</div>
+      <h2 class="sec-title" style="color:white">Everything a Traveller Needs</h2>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon">✅</div><div class="feat-title">Govt. Verified Data</div><div class="feat-desc">Every fact sourced from ASI, Ministry of Tourism and data.gov.in. Zero fake information.</div></div>
+      <div class="feat-card"><div class="feat-icon">🤖</div><div class="feat-title">AI Travel Guide</div><div class="feat-desc">Ask anything in plain language — powered by our Node.js + MongoDB backend AI chatbot.</div></div>
+      <div class="feat-card"><div class="feat-icon">🛂</div><div class="feat-title">Visa Tracker</div><div class="feat-desc">Real-time visa expiry tracking. Automated email alerts at 30, 7, and 1 day before expiry.</div></div>
+      <div class="feat-card"><div class="feat-icon">💎</div><div class="feat-title">Hidden Gems</div><div class="feat-desc">Discover Ziro, Majuli, Dholavira — breathtaking places commercial platforms never show.</div></div>
+      <div class="feat-card"><div class="feat-icon">🗄️</div><div class="feat-title">MongoDB Database</div><div class="feat-desc">All tourist data securely stored in MongoDB. JWT-protected APIs. Real-time sync.</div></div>
+      <div class="feat-card"><div class="feat-icon">⏰</div><div class="feat-title">Daily Cron Alerts</div><div class="feat-desc">Automated email alerts run at 6AM IST daily. Overstay detection triggers FRRO report.</div></div>
+      <div class="feat-card"><div class="feat-icon">🚨</div><div class="feat-title">SOS Emergency</div><div class="feat-desc">One-tap access to police, hospitals, FRRO helpline and Tourist Helpline 1800-11-1363.</div></div>
+      <div class="feat-card"><div class="feat-icon">🌐</div><div class="feat-title">Multilingual</div><div class="feat-desc">Available in Hindi, English, Tamil, Bengali and 10+ Indian languages.</div></div>
+    </div>
+  </div>
+
+  <!-- VISA SECTION -->
+  <div class="visa-section">
+    <div class="visa-inner">
+      <div class="sec-tag" style="color:var(--saffron2)">✦ Unique Feature</div>
+      <h2 class="sec-title" style="color:white">Tourist Visa Overstay Prevention System</h2>
+      <p style="color:rgba(255,255,255,0.5);margin-top:0.8rem;font-size:0.95rem">A critical national security and tourism management feature — unique to Yatra</p>
+      <div class="visa-alert-box">
+        <div class="visa-alert-icon">🛂</div>
+        <div class="visa-alert-title">Why This Matters</div>
+        <div class="visa-alert-desc">Every year, thousands of tourists enter India on a valid Tourist Visa but remain after expiry. Yatra's backend (Node.js + MongoDB) monitors every registered tourist's visa status in real-time and sends automated email alerts — protecting both the tourist and India's borders. Overstay data is reported directly to FRRO via our Admin Dashboard.</div>
+      </div>
+      <div class="visa-stats">
+        <div class="visa-stat"><div class="visa-stat-n">30 Days</div><div class="visa-stat-l">First Alert</div></div>
+        <div class="visa-stat"><div class="visa-stat-n">7 Days</div><div class="visa-stat-l">Urgent Alert</div></div>
+        <div class="visa-stat"><div class="visa-stat-n">24 Hrs</div><div class="visa-stat-l">Final Warning</div></div>
+        <div class="visa-stat"><div class="visa-stat-n">Auto</div><div class="visa-stat-l">FRRO Flagged</div></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">Yatra · यात्रा</div>
+    <div class="footer-links">
+      <a href="#">About</a><a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a><a href="#">Contact</a>
+      <a href="https://data.gov.in" target="_blank">data.gov.in</a>
+      <a href="https://incredibleindia.org" target="_blank">incredibleindia.org</a>
+    </div>
+    <div class="footer-bottom">
+      Made with ❤️ for Incredible India · Hackathon 2025
+      <div class="footer-sources">Data Sources: Ministry of Tourism · ASI (asi.nic.in) · data.gov.in · Ministry of External Affairs</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════ -->
+<div class="page auth-page" id="page-login">
+  <div class="auth-card">
+    <div class="auth-ornament">🛕</div>
+    <div class="auth-title">Welcome Back</div>
+    <div class="auth-sub">Login to your Yatra account · यात्रा में आपका स्वागत है</div>
+    <div class="auth-form">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="l-email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="l-pass" placeholder="Enter your password" onkeypress="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="field-error" id="l-err"></div>
+      <button class="btn-auth" id="l-btn" onclick="doLogin()">Login to Yatra →</button>
+    </div>
+    <div class="auth-divider">or</div>
+    <div class="auth-switch">Don't have an account? <a onclick="showPage('signup')">Register here</a></div>
+    <div class="auth-switch" style="margin-top:0.5rem"><a onclick="goHome()">← Back to Home</a></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SIGNUP PAGE
+══════════════════════════════════════ -->
+<div class="page auth-page" id="page-signup">
+  <div class="auth-card" style="max-width:520px">
+    <div class="auth-ornament">🇮🇳</div>
+    <div class="auth-title">Register as Tourist</div>
+    <div class="auth-sub">Create your Yatra account — data stored securely in MongoDB</div>
+    <div class="tourist-notice">
+      <strong>🛂 Visa Tracking Notice</strong>
+      Your visa information will be stored in our secure MongoDB database and tracked in real-time. You'll receive automated email alerts before your visa expires.
+    </div>
+    <div class="auth-form">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="s-fname" placeholder="John"></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="s-lname" placeholder="Smith"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="s-email" placeholder="you@example.com"></div>
+      <div class="form-group">
+        <label class="form-label">Nationality / Country</label>
+        <select class="form-select" id="s-country" onchange="toggleVisaFields()">
+          <option value="">Select your country</option>
+          <option>India (Domestic Tourist)</option>
+          <option>United States</option><option>United Kingdom</option>
+          <option>Germany</option><option>France</option><option>Japan</option>
+          <option>Australia</option><option>Canada</option><option>UAE</option>
+          <option>Russia</option><option>China</option><option>Other</option>
+        </select>
+      </div>
+
+      <!-- Foreign tourist visa fields — shown/hidden by JS -->
+      <div id="visa-foreign-fields">
+        <div class="form-group">
+          <label class="form-label">Visa Type</label>
+          <select class="form-select" id="s-vtype">
+            <option value="">Select visa type</option>
+            <option>e-Tourist Visa (30 Days)</option>
+            <option>e-Tourist Visa (1 Year)</option>
+            <option>e-Tourist Visa (5 Years)</option>
+            <option>Regular Tourist Visa</option>
+            <option>Business Visa</option>
+            <option>Student Visa</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Visa Issue Date</label><input class="form-input" type="date" id="s-vissue"></div>
+          <div class="form-group"><label class="form-label">Visa Expiry Date</label><input class="form-input" type="date" id="s-vexpiry"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Passport Number</label><input class="form-input" id="s-passport" placeholder="e.g. A1234567"></div>
+      </div>
+
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="s-pass" placeholder="Create a strong password (min 6 chars)"></div>
+      <div class="field-error" id="s-err"></div>
+      <button class="btn-auth" id="s-btn" onclick="doSignup()">Complete Registration →</button>
+    </div>
+    <div class="auth-switch" style="margin-top:1rem">Already have an account? <a onclick="showPage('login')">Login here</a></div>
+    <div class="auth-switch" style="margin-top:0.5rem"><a onclick="goHome()">← Back to Home</a></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     DASHBOARD PAGE
+══════════════════════════════════════ -->
+<div class="page" id="page-dashboard">
+  <div class="dash-wrap">
+
+    <div class="dash-header">
+      <div class="dash-welcome" id="d-welcome">Welcome back!</div>
+      <div class="dash-sub" id="d-sub">Your Yatra Dashboard · Government Verified Account</div>
+    </div>
+
+    <!-- Admin summary strip (hidden for regular tourists) -->
+    <div class="summary-strip" id="d-summary" style="display:none"></div>
+
+    <!-- User info cards -->
+    <div class="dash-grid" id="d-cards"></div>
+
+    <!-- Visa status card (live from backend) -->
+    <div class="visa-status-card" id="d-visa"></div>
+
+    <!-- Tourist Registry Table -->
+    <div class="tourists-table-wrap">
+      <div class="table-header">
+        <div class="table-title">🛂 Tourist Registry — Live Visa Tracker</div>
+        <div class="table-controls">
+          <input class="search-input" id="t-search" placeholder="🔍 Search tourists…" oninput="searchTable(this.value)">
+          <select class="filter-sel" onchange="loadTable(this.value)">
+            <option value="all">All Status</option>
+            <option value="active">✅ Active</option>
+            <option value="expiring_soon">⏰ Expiring Soon</option>
+            <option value="critical">⚠️ Critical</option>
+            <option value="overstay">🚨 Overstay</option>
+          </select>
+          <button class="btn-refresh" onclick="loadTable()">🔄 Refresh</button>
+        </div>
+      </div>
+      <div id="t-container"><div class="t-load">⏳ Loading tourist data from MongoDB…</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CHATBOT
+══════════════════════════════════════ -->
+<button class="chat-fab" onclick="toggleChat()">🤖</button>
+<div class="chat-window" id="chatWin">
+  <div class="chat-head">
+    <div class="chat-avatar-wrap">🏛️</div>
+    <div class="chat-head-info">
+      <h3>Yatra AI Guide</h3>
+      <p><span class="chat-online"></span>Online · Backend Powered</p>
+    </div>
+    <button class="chat-x" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-msgs" id="chatMsgs"></div>
+  <div class="quick-chips" id="quickChips">
+    <button class="chip" onclick="sendQ('Best places to visit in India?')">🗺️ Best Places</button>
+    <button class="chip" onclick="sendQ('Tell me about Taj Mahal')">🕌 Taj Mahal</button>
+    <button class="chip" onclick="sendQ('Visa requirements for tourists')">📋 Visa Info</button>
+    <button class="chip" onclick="sendQ('Hidden gems of India')">💎 Hidden Gems</button>
+    <button class="chip" onclick="sendQ('Tell me about Ziro Valley')">🌿 Ziro</button>
+    <button class="chip" onclick="sendQ('Tell me about Chopta')">❄️ Chopta</button>
+    <button class="chip" onclick="sendQ('Emergency contacts in India')">🚨 Emergency</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-inp" id="chatInp" placeholder="Ask anything about India…" onkeypress="if(event.key==='Enter')sendMsg()">
+    <button class="chat-send" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT — FULLY CONNECTED TO BACKEND
+══════════════════════════════════════ -->
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CONFIG  ← change this to your server IP when deploying
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const API_BASE = 'http://localhost:5000/api';
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// APP STATE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let currentUser  = null;
+let authToken    = localStorage.getItem('yatra_token') || null;
+let cachedTourists = [];
+let chatOpen     = false;
+let chatFirst    = true;
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DESTINATION DATA (static govt. data)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const DESTINATIONS = [
+  { e:'🕌', name:'Taj Mahal',        state:'Uttar Pradesh',    desc:'One of the Seven Wonders of the World. UNESCO Heritage Site built by Emperor Shah Jahan in 1632.',         tags:['UNESCO','Heritage','Mughal'],  type:'popular heritage' },
+  { e:'🏔️', name:'Valley of Flowers', state:'Uttarakhand',      desc:'UNESCO World Heritage. Meadows of endemic alpine flowers with breathtaking Himalayan scenery.',            tags:['UNESCO','Nature','Trekking'],  type:'popular nature'  },
+  { e:'🌴', name:'Kerala Backwaters', state:'Kerala',            desc:"Network of canals, rivers and lakes. God's Own Country — a houseboat paradise.",                          tags:['Nature','Houseboat','Wellness'],type:'popular nature'  },
+  { e:'🏖️', name:'Goa Beaches',      state:'Goa',               desc:'Pristine beaches, Portuguese heritage churches, and vibrant local culture.',                               tags:['Beach','Heritage','Food'],     type:'popular'         },
+  { e:'🐅', name:'Ranthambore',      state:'Rajasthan',         desc:"One of India's largest national parks. Famous for Bengal tigers in natural habitat.",                      tags:['Wildlife','Safari','Nature'],  type:'popular nature'  },
+  { e:'🏯', name:'Amber Fort',       state:'Rajasthan',         desc:"Majestic hill fort blending Rajput and Mughal architecture. Rajasthan's crown jewel.",                    tags:['Fort','Heritage','UNESCO'],    type:'popular heritage'},
+  { e:'🌿', name:'Ziro Valley',      state:'Arunachal Pradesh', desc:'UNESCO tentative site. Home to the ancient Apatani tribe. Lush pine hills and unique rice cultivation.',  tags:['Hidden Gem','Tribal','Nature'],type:'hidden nature'   },
+  { e:'🏝️', name:'Majuli Island',    state:'Assam',             desc:"World's largest river island. Hub of neo-Vaishnavite culture and rare migratory birds.",                  tags:['Hidden Gem','Culture','Wildlife'],type:'hidden nature' },
+  { e:'🏛️', name:'Dholavira',       state:'Gujarat',           desc:'UNESCO Heritage (2021). One of the largest Indus Valley Civilization cities — 5,000 years old.',          tags:['UNESCO','Hidden Gem','Ancient'],type:'hidden heritage' },
+  { e:'❄️', name:'Chopta',           state:'Uttarakhand',       desc:"Mini Switzerland of India. Gateway to Tungnath — world's highest Shiva temple.",                          tags:['Hidden Gem','Trekking','Nature'],type:'hidden nature'  },
+  { e:'🌊', name:'Spiti Valley',     state:'Himachal Pradesh',  desc:'Cold desert between India and Tibet. Ancient monasteries and untouched landscapes.',                       tags:['Hidden Gem','Adventure','Spiritual'],type:'hidden nature'},
+  { e:'🦚', name:'Orchha',           state:'Madhya Pradesh',    desc:'Forgotten medieval town on Betwa river. Magnificent forts and cenotaphs. UNESCO nominated.',              tags:['Hidden Gem','Heritage','Spiritual'],type:'hidden heritage'},
+];
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// OFFLINE FALLBACK CHATBOT REPLIES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const FALLBACK = {
+  'taj|agra':           "🕌 Taj Mahal, Agra\nUNESCO World Heritage. Entry: ₹50 (Indians) | ₹1,100 (Foreigners)\nTimings: Sunrise–Sunset (closed Fridays)\nBest time: Oct–Mar\n✅ Source: ASI (asi.nic.in)",
+  'kerala|backwater':   "🌴 Kerala — God's Own Country\nTop: Alleppey, Munnar, Periyar, Kovalam\nBest time: Sept–March\n✅ Source: Kerala Tourism",
+  'visa|passport':      "🛂 India Tourist Visa\ne-Visa: 160+ countries | indianvisaonline.gov.in\nDurations: 30 days / 1 year / 5 years\nFee: ~$25–80\n✅ Source: Ministry of External Affairs",
+  'best|top|must':      "🗺️ Top Must-Visit Places:\n1. Taj Mahal, Agra\n2. Kerala Backwaters\n3. Goa Beaches\n4. Rajasthan Forts\n5. Valley of Flowers\n6. Ziro Valley (Hidden Gem)\n7. Dholavira (UNESCO)\n✅ Govt Verified",
+  'ziro|arunachal':     "🌿 Ziro Valley, Arunachal Pradesh\nApatani tribe, UNESCO tentative list\nBest: March–Oct | Altitude: 1,500m\nPermit: Inner Line Permit needed\n✅ Source: Arunachal Tourism",
+  'majuli|assam':       "🏝️ Majuli Island, Assam\nWorld's largest river island!\nBest: Oct–March | Famous: Sattra monasteries\n✅ Source: Assam Tourism",
+  'dholavira|indus':    "🏛️ Dholavira, Gujarat\nUNESCO Heritage 2021. 5,000-year-old Indus Valley city\nBest: Oct–Feb | Entry: ₹35 (Indians)\n✅ Source: ASI",
+  'chopta|tungnath|switzerland':"❄️ Chopta — Mini Switzerland of India\nGateway to Tungnath (world's highest Shiva temple)\nBest: March–May & Sept–Nov\n✅ Source: Uttarakhand Tourism",
+  'spiti|himachal':     "🌊 Spiti Valley, Himachal Pradesh\nCold desert between India & Tibet\nBest: June–Sept | Key spots: Key Monastery, Chandratal\n✅ Source: HP Tourism",
+  'hidden|gem|offbeat': "💎 Hidden Gems of India:\n1. Ziro Valley, Arunachal\n2. Majuli Island, Assam\n3. Dholavira, Gujarat (UNESCO)\n4. Chopta, Uttarakhand\n5. Spiti Valley, HP\n6. Orchha, MP\n✅ All Govt Verified",
+  'emergency|sos|police|frro': "🚨 Emergency Contacts:\nPolice: 100 | Ambulance: 108 | Fire: 101\nTourist Helpline: 1800-11-1363\nFRRO (Visa): 1800-11-1552\nWomen: 1091\n✅ Ministry of Home Affairs",
+};
+
+function fallbackReply(msg) {
+  const m = msg.toLowerCase();
+  for (const [keys, reply] of Object.entries(FALLBACK)) {
+    if (keys.split('|').some(k => m.includes(k))) return reply;
+  }
+  return "🙏 Namaste! I'm your Yatra AI Guide — backed by Node.js + MongoDB!\n\nAsk me about:\n• 🗺️ Any destination in India\n• 🛂 Visa & entry requirements\n• 💎 Hidden gems\n• 🚨 Emergency contacts\n\n✅ All information is Government Verified!";
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// API HELPER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function api(endpoint, method = 'GET', body = null) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res  = await fetch(`${API_BASE}${endpoint}`, opts);
+    const data = await res.json();
+    return { ok: res.ok, status: res.status, data };
+  } catch {
+    return { ok: false, status: 0, data: { message: 'Cannot reach server. Is backend running?' } };
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TOAST
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PAGE ROUTING
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+  if (name === 'dashboard') initDashboard();
+}
+function goHome() { showPage('home'); }
+function scrollTo(id) {
+  showPage('home');
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 80);
+}
+function requireAuth() {
+  if (!currentUser) { toast('Please login to access dashboard', 'warning'); showPage('login'); return; }
+  showPage('dashboard');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DESTINATIONS RENDER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderDest(filter = 'all') {
+  const list = filter === 'all' ? DESTINATIONS : DESTINATIONS.filter(d => d.type.includes(filter));
+  document.getElementById('destGrid').innerHTML = list.map(d => `
+    <div class="dest-card">
+      <div class="dest-img" style="background:linear-gradient(135deg,${d.type.includes('hidden') ? 'rgba(212,160,23,0.12),rgba(19,136,8,0.08)' : 'rgba(232,80,26,0.08),rgba(201,146,10,0.08)'})">
+        ${d.e}
+        <div class="badge-verified">✅ Verified</div>
+        ${d.type.includes('hidden') ? '<div class="badge-hidden">💎 Hidden Gem</div>' : ''}
+      </div>
+      <div class="dest-body">
+        <div class="dest-state">${d.state}</div>
+        <div class="dest-name">${d.name}</div>
+        <div class="dest-desc">${d.desc}</div>
+        <div class="dest-tags">${d.tags.map(t => `<span class="dtag">${t}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+function filterDest(type, btn) {
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDest(type);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// AUTH — FORM HELPERS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toggleVisaFields() {
+  const country = document.getElementById('s-country').value;
+  const show    = country && country !== 'India (Domestic Tourist)';
+  document.getElementById('visa-foreign-fields').style.display = show ? 'block' : 'none';
+}
+function setBtn(id, loading, defaultText) {
+  const btn = document.getElementById(id);
+  btn.disabled  = loading;
+  btn.innerHTML = loading ? '<div class="spin"></div> Please wait…' : defaultText;
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// LOGIN  →  POST /api/auth/login
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  if (!email || !pass) { showErr('l-err', 'Please fill all fields.'); return; }
+
+  setBtn('l-btn', true, 'Login to Yatra →');
+  const { ok, data } = await api('/auth/login', 'POST', { email, password: pass });
+  setBtn('l-btn', false, 'Login to Yatra →');
+
+  if (!ok) { showErr('l-err', data.message || 'Login failed.'); return; }
+
+  saveSession(data.token, data.user);
+  updateNav();
+  toast(`🙏 Welcome back, ${data.user.name.split(' ')[0]}!`, 'success');
+
+  if (data.visaAlert) {
+    setTimeout(() => toast(data.visaAlert.message, data.visaAlert.type === 'danger' ? 'error' : 'warning'), 1200);
+  }
+  showPage('dashboard');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SIGNUP  →  POST /api/auth/register
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function doSignup() {
+  const fname   = document.getElementById('s-fname').value.trim();
+  const lname   = document.getElementById('s-lname').value.trim();
+  const email   = document.getElementById('s-email').value.trim();
+  const country = document.getElementById('s-country').value;
+  const vtype   = document.getElementById('s-vtype').value;
+  const vissue  = document.getElementById('s-vissue').value;
+  const vexpiry = document.getElementById('s-vexpiry').value;
+  const passport= document.getElementById('s-passport').value.trim();
+  const pass    = document.getElementById('s-pass').value;
+
+  if (!fname || !lname || !email || !country || !pass)
+    { showErr('s-err', 'Please fill all required fields.'); return; }
+  if (pass.length < 6)
+    { showErr('s-err', 'Password must be at least 6 characters.'); return; }
+
+  setBtn('s-btn', true, 'Complete Registration →');
+  const { ok, data } = await api('/auth/register', 'POST', {
+    firstName: fname, lastName: lname, email, password: pass,
+    nationality: country, passportNumber: passport,
+    visaType: vtype, visaIssueDate: vissue, visaExpiryDate: vexpiry
+  });
+  setBtn('s-btn', false, 'Complete Registration →');
+
+  if (!ok) { showErr('s-err', data.message || 'Registration failed.'); return; }
+
+  saveSession(data.token, data.user);
+  updateNav();
+  toast(`🎉 Welcome to Yatra, ${fname}! Account saved to MongoDB.`, 'success');
+  showPage('dashboard');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// LOGOUT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function doLogout() {
+  clearSession();
+  updateNav();
+  toast('Logged out successfully', 'success');
+  goHome();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SESSION HELPERS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function saveSession(token, user) {
+  authToken   = token;
+  currentUser = user;
+  localStorage.setItem('yatra_token', token);
+  localStorage.setItem('yatra_user',  JSON.stringify(user));
+}
+function clearSession() {
+  authToken = null; currentUser = null;
+  localStorage.removeItem('yatra_token');
+  localStorage.removeItem('yatra_user');
+}
+function updateNav() {
+  const guest = document.getElementById('nav-guest');
+  const user  = document.getElementById('nav-user');
+  if (currentUser) {
+    guest.style.display = 'none';
+    user.style.display  = 'flex';
+    document.getElementById('nav-av').textContent = currentUser.name[0].toUpperCase();
+    document.getElementById('nav-nm').textContent = currentUser.name.split(' ')[0];
+  } else {
+    guest.style.display = 'flex';
+    user.style.display  = 'none';
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DASHBOARD INIT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function initDashboard() {
+  if (!currentUser) { showPage('login'); return; }
+
+  document.getElementById('d-welcome').textContent = `Namaste, ${currentUser.name}! 🙏`;
+  document.getElementById('d-sub').textContent =
+    `${currentUser.nationality || currentUser.country || 'N/A'} · ` +
+    `${currentUser.role === 'admin' ? 'Admin Access' : 'Tourist Account'} · MongoDB ✅`;
+
+  // Fetch live visa status from backend
+  const { ok, data } = await api('/visa/my-status');
+  const visa = ok ? data.visa : (currentUser.visa || {});
+
+  renderDashCards(visa);
+  renderVisaCard(visa, ok ? data : null);
+
+  if (ok && data.alert) {
+    setTimeout(() => toast(data.alert.message,
+      data.alert.level === 'CRITICAL' ? 'error' : 'warning'), 800);
+  }
+
+  // Admin: load summary + full table
+  if (currentUser.role === 'admin') loadAdminSummary();
+
+  loadTable();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DASHBOARD CARDS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderDashCards(visa) {
+  const days = visa?.daysRemaining ?? null;
+  const cls  = days === null ? 'safe' : days < 0 ? 'danger' : days <= 30 ? 'warning' : 'safe';
+  const dTxt = days === null ? 'N/A' : days < 0 ? `${Math.abs(days)} days OVERSTAYED` : `${days} days`;
+
+  document.getElementById('d-cards').innerHTML = `
+    <div class="dash-card">
+      <div class="dash-card-icon">🌍</div>
+      <div class="dash-card-label">Nationality</div>
+      <div class="dash-card-value" style="font-size:1.1rem">${currentUser.nationality || 'N/A'}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-icon">🛂</div>
+      <div class="dash-card-label">Visa Type</div>
+      <div class="dash-card-value" style="font-size:1rem">${visa?.type || 'Domestic'}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-icon">📅</div>
+      <div class="dash-card-label">Days Until Expiry</div>
+      <div class="dash-card-value ${cls}">${dTxt}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-icon">🔐</div>
+      <div class="dash-card-label">Passport</div>
+      <div class="dash-card-value" style="font-size:1.1rem">${currentUser.passport || currentUser.passportNumber || 'N/A'}</div>
+    </div>`;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// VISA STATUS CARD
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderVisaCard(visa, fullData) {
+  const vc = document.getElementById('d-visa');
+
+  if (!visa?.expiryDate) {
+    vc.innerHTML = `<div class="visa-status-title">🛂 Visa Status</div>
+      <p style="color:var(--muted);font-size:0.9rem">✅ Registered as Domestic Tourist. No visa tracking required. Data safely stored in MongoDB.</p>`;
+    return;
+  }
+
+  const days = visa.daysRemaining;
+  const pct  = Math.max(0, Math.min(100, ((days || 0) / 365) * 100));
+  const cls  = days < 0 ? 'danger' : days <= 30 ? 'warning' : 'safe';
+  const clrVar = cls === 'safe' ? 'var(--green2)' : cls === 'warning' ? 'var(--gold)' : 'var(--saffron)';
+
+  let alertHtml = '';
+  if (days < 0) {
+    alertHtml = `
+      <div class="overstay-alert">
+        <div class="overstay-alert-title">🚨 VISA OVERSTAY DETECTED — IMMEDIATE ACTION REQUIRED</div>
+        <div class="overstay-alert-desc">Your visa expired <strong>${Math.abs(days)} days ago</strong>. This has been flagged in our database and will be reported to FRRO. Report to the nearest FRRO office immediately. Failure may result in deportation, fines, and future visa bans.</div>
+      </div>
+      <div class="emergency-contacts">
+        <div class="emergency-title">📞 Report Immediately To</div>
+        <div class="emergency-item"><span>FRRO Helpline</span><span class="emergency-num">1800-11-1552</span></div>
+        <div class="emergency-item"><span>Tourist Helpline</span><span class="emergency-num">1800-11-1363</span></div>
+        <div class="emergency-item"><span>Police Emergency</span><span class="emergency-num">100</span></div>
+        <div class="emergency-item"><span>Ministry of Home Affairs</span><span class="emergency-num">011-23092011</span></div>
+      </div>`;
+  } else if (days <= 30) {
+    alertHtml = `
+      <div class="overstay-alert" style="border-color:rgba(201,146,10,0.4);background:rgba(201,146,10,0.06)">
+        <div class="overstay-alert-title" style="color:var(--gold)">⚠️ VISA EXPIRING SOON — Please Plan Your Departure</div>
+        <div class="overstay-alert-desc">Your visa expires in <strong>${days} days</strong> on ${new Date(visa.expiryDate).toDateString()}. An email alert has been sent. Apply for extension at FRRO or ensure departure before expiry. FRRO: 1800-11-1552</div>
+      </div>`;
+  }
+
+  vc.innerHTML = `
+    <div class="visa-status-title">🛂 Your Visa Status <span class="live-badge">Live from MongoDB</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:var(--muted);margin-bottom:0.5rem">
+      <span>Issue: ${visa.issueDate ? new Date(visa.issueDate).toDateString() : 'N/A'}</span>
+      <span>Expiry: ${new Date(visa.expiryDate).toDateString()}</span>
+    </div>
+    <div class="visa-progress-bar">
+      <div class="visa-progress-fill ${cls}" style="width:${pct}%"></div>
+    </div>
+    <div class="visa-days-row">
+      <span>Visa Start</span>
+      <span style="font-weight:600;color:${clrVar}">${days < 0 ? 'OVERSTAYED ⚠️' : days + ' days remaining'}</span>
+      <span>Visa End</span>
+    </div>
+    ${alertHtml}`;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ADMIN SUMMARY  →  GET /api/tourists/stats/dashboard
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function loadAdminSummary() {
+  const strip = document.getElementById('d-summary');
+  strip.style.display = 'grid';
+  const { ok, data }  = await api('/tourists/stats/dashboard');
+  if (!ok) return;
+  const s = data.stats;
+  strip.innerHTML = `
+    <div class="scard c-green"><div class="scard-n">${s.active}</div><div class="scard-l">✅ Active Tourists</div></div>
+    <div class="scard c-gold"><div class="scard-n">${s.expiring}</div><div class="scard-l">⏰ Expiring Soon</div></div>
+    <div class="scard c-orange"><div class="scard-n">${s.critical}</div><div class="scard-l">⚠️ Critical (7d)</div></div>
+    <div class="scard c-red"><div class="scard-n">${s.overstay}</div><div class="scard-l">🚨 Overstay</div></div>`;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TOURIST TABLE  →  GET /api/tourists
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function loadTable(statusFilter = 'all') {
+  document.getElementById('t-container').innerHTML =
+    '<div class="t-load">⏳ Fetching from MongoDB…</div>';
+
+  let endpoint = '/tourists';
+  if (statusFilter && statusFilter !== 'all') endpoint += `?status=${statusFilter}`;
+
+  const { ok, data } = await api(endpoint);
+
+  if (!ok) {
+    // Backend offline — show demo data
+    cachedTourists = getDemoTourists();
+    document.getElementById('t-container').innerHTML = buildTable(cachedTourists);
+    toast('Backend offline — showing demo data', 'warning');
+    return;
+  }
+
+  cachedTourists = data.tourists || [];
+  document.getElementById('t-container').innerHTML = buildTable(cachedTourists);
+}
+
+function searchTable(q) {
+  const filtered = cachedTourists.filter(t => {
+    const name     = (t.fullName || t.name || '').toLowerCase();
+    const country  = (t.nationality || t.country || '').toLowerCase();
+    const passport = (t.passportNo || t.passport || '').toLowerCase();
+    return name.includes(q.toLowerCase()) || country.includes(q.toLowerCase()) || passport.includes(q.toLowerCase());
+  });
+  document.getElementById('t-container').innerHTML = buildTable(filtered);
+}
+
+function buildTable(tourists) {
+  if (!tourists.length) return '<div class="t-empty">📭 No tourists found.</div>';
+
+  const today = new Date();
+  const rows  = tourists.map(t => {
+    const expiry = new Date(t.expiryDate || t.expiry);
+    const days   = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+    let sc, st;
+    if (days < 0)       { sc = 'status-overstay'; st = `🚨 Overstay ${Math.abs(days)}d`; }
+    else if (days <= 7) { sc = 'status-expiring'; st = `⚠️ ${days}d left`; }
+    else if (days <= 30){ sc = 'status-expiring'; st = `⏰ ${days}d left`; }
+    else                { sc = 'status-active';   st = `✅ Active`; }
+    const dayColor = days < 0 ? 'var(--saffron)' : days <= 30 ? 'var(--gold)' : 'var(--green2)';
+    const entryDate = t.entryDate || t.entry;
+    return `<tr>
+      <td><strong>${t.fullName || t.name}</strong></td>
+      <td>${t.nationality || t.country}</td>
+      <td style="font-family:monospace;font-size:0.82rem">${t.passportNo || t.passport}</td>
+      <td>${t.visaType || t.visa}</td>
+      <td>${entryDate ? new Date(entryDate).toLocaleDateString('en-IN') : 'N/A'}</td>
+      <td>${expiry.toLocaleDateString('en-IN')}</td>
+      <td style="font-weight:700;color:${dayColor}">${days < 0 ? 'EXPIRED' : days + 'd'}</td>
+      <td><span class="status-badge ${sc}">${st}</span></td>
+    </tr>`;
+  }).join('');
+
+  return `<table>
+    <thead><tr>
+      <th>Tourist Name</th><th>Country</th><th>Passport No.</th>
+      <th>Visa Type</th><th>Entry Date</th><th>Expiry Date</th>
+      <th>Days Left</th><th>Status</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// Demo data (shown when backend is offline)
+function getDemoTourists() {
+  return [
+    { fullName:'Maria Garcia',     nationality:'Spain',   passportNo:'ESP123456', visaType:'e-Tourist (1 Year)',  entryDate:'2024-06-15', expiryDate:'2025-06-15' },
+    { fullName:'John Williams',    nationality:'USA',     passportNo:'USA789012', visaType:'e-Tourist (30 Days)', entryDate:'2025-01-10', expiryDate:'2025-02-10' },
+    { fullName:'Yuki Tanaka',      nationality:'Japan',   passportNo:'JPN456789', visaType:'e-Tourist (30 Days)', entryDate:'2025-02-01', expiryDate:'2025-03-03' },
+    { fullName:'Pierre Dupont',    nationality:'France',  passportNo:'FRA321654', visaType:'Regular Tourist',     entryDate:'2024-12-01', expiryDate:'2025-01-31' },
+    { fullName:'Emma Schmidt',     nationality:'Germany', passportNo:'GER654987', visaType:'e-Tourist (1 Year)',  entryDate:'2024-09-20', expiryDate:'2025-09-20' },
+    { fullName:'James Brown',      nationality:'UK',      passportNo:'GBR999888', visaType:'e-Tourist (5 Years)', entryDate:'2023-11-10', expiryDate:'2028-11-10' },
+    { fullName:'Fatima Al-Rashid', nationality:'UAE',     passportNo:'UAE555444', visaType:'e-Tourist (30 Days)', entryDate:'2025-01-05', expiryDate:'2025-02-05' },
+  ];
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CHATBOT  →  POST /api/chat
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function addMsg(text, role) {
+  const c = document.getElementById('chatMsgs');
+  const d = document.createElement('div');
+  d.className  = `msg ${role}`;
+  d.style.whiteSpace = 'pre-line';
+  d.textContent = text;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+function showTyping() {
+  const c = document.getElementById('chatMsgs');
+  const d = document.createElement('div');
+  d.className = 'typing'; d.id = 'chatTyping';
+  d.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function hideTyping() { document.getElementById('chatTyping')?.remove(); }
+
+async function sendMsg() {
+  const inp = document.getElementById('chatInp');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  addMsg(txt, 'user');
+  inp.value = '';
+  document.getElementById('quickChips').style.display = 'none';
+  showTyping();
+
+  // Call backend chatbot API
+  const { ok, data } = await api('/chat', 'POST', {
+    message: txt,
+    sessionId: currentUser?.id || 'guest'
+  });
+  hideTyping();
+
+  if (ok && data.reply?.message) {
+    addMsg(data.reply.message, 'bot');
+    // Refresh suggestion chips from backend response
+    if (data.reply.suggestions?.length) {
+      const chips = document.getElementById('quickChips');
+      chips.style.display = 'flex';
+      chips.innerHTML = data.reply.suggestions.slice(0, 4)
+        .map(s => `<button class="chip" onclick="sendQ('${s.replace(/'/g,"\\'")}')">${s}</button>`)
+        .join('');
+    }
+  } else {
+    // Offline fallback
+    addMsg(fallbackReply(txt), 'bot');
+  }
+}
+
+function sendQ(msg) {
+  document.getElementById('chatInp').value = msg;
+  sendMsg();
+}
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chatWin').classList.toggle('open', chatOpen);
+  if (chatOpen && chatFirst) {
+    chatFirst = false;
+    setTimeout(() => addMsg(
+      "🙏 Namaste! I'm your Yatra AI Guide — powered by Node.js + Express backend!\n\nI can help with:\n• 🗺️ Any destination across India\n• 🛂 Visa & entry requirements\n• 💎 Hidden gems of India\n• 🚨 Emergency contacts\n\nAll information is ✅ Government Verified!\n\nWhat would you like to know about Incredible India?",
+      'bot'), 300);
+  }
+}
+function openChat() { if (!chatOpen) toggleChat(); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// API STATUS CHECK  →  GET /api/health
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function checkApiStatus() {
+  const dot = document.getElementById('apiDot');
+  const txt = document.getElementById('apiTxt');
+  try {
+    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
+    if (res.ok) { dot.className = 'api-dot on';  txt.textContent = 'Backend Online';  }
+    else        { dot.className = 'api-dot off'; txt.textContent = 'Backend Error';   }
+  } catch {
+    dot.className = 'api-dot off'; txt.textContent = 'Backend Offline';
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RESTORE SESSION  →  GET /api/auth/me
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function restoreSession() {
+  const savedUser  = localStorage.getItem('yatra_user');
+  const savedToken = localStorage.getItem('yatra_token');
+  if (!savedToken || !savedUser) return;
+
+  authToken   = savedToken;
+  currentUser = JSON.parse(savedUser);
+  updateNav(); // show nav immediately from cache
+
+  // Verify token is still valid with backend
+  const { ok, data } = await api('/auth/me');
+  if (ok && data.user) {
+    currentUser = data.user;
+    localStorage.setItem('yatra_user', JSON.stringify(currentUser));
+    updateNav();
+  } else {
+    // Token expired — clear session silently
+    clearSession();
+    updateNav();
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// STARTUP
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+(async () => {
+  renderDest();
+  toggleVisaFields();
+  await checkApiStatus();
+  await restoreSession();
+  // Re-check API health every 30s
+  setInterval(checkApiStatus, 30000);
+})();
+</script>
+</body>
+</html>
